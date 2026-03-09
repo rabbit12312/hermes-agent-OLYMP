@@ -22,6 +22,13 @@ try:
 except ImportError:
     HAS_CRONITER = False
 
+# OLYMPUS Auto-Setup
+try:
+    from olympus.setup_crons import maybe_register_all
+    maybe_register_all()
+except ImportError:
+    pass
+
 # =============================================================================
 # Configuration
 # =============================================================================

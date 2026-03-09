@@ -58,6 +58,8 @@ _HERMES_CORE_TOOLS = [
     "execute_code", "delegate_task",
     # Cronjob management
     "schedule_cronjob", "list_cronjobs", "remove_cronjob",
+    # OLYMPUS Second Brain
+    "olympus_orchestrate",
     # Cross-platform messaging (gated on gateway running via check_fn)
     "send_message",
     # Honcho user context (gated on honcho being active via check_fn)
@@ -200,6 +202,12 @@ TOOLSETS = {
         "description": "Home Assistant smart home control and monitoring",
         "tools": ["ha_list_entities", "ha_get_state", "ha_list_services", "ha_call_service"],
         "includes": []
+    },
+
+    "olympus": {
+        "description": "The OLYMPUS Second Brain — a divine multi-agent system for information capture, search, and proactive monitoring.",
+        "tools": ["olympus_orchestrate"],
+        "includes": ["memory", "session_search", "todo", "file", "cronjob"]
     },
 
 

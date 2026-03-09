@@ -98,5 +98,29 @@ def main() -> None:
         sys.exit(1)
 
 
+def maybe_register_all() -> None:
+    """
+    Background-safe registration of all OLYMPUS cron jobs.
+    Only registers if they don't already exist.
+    """
+    from cron.jobs import list_jobs
+    existing_names = {j["name"] for j in list_jobs()}
+    
+    for defn in CRONS:
+        if defn["name"] not in existing_names:
+            # Run registration quietly in background
+            cmd = [
+                "hermes", "cron", "add",
+                "--name",     defn["name"],
+                "--schedule", defn["schedule"],
+                "--skill",    defn["skill"],
+                "--goal",     defn["goal"],
+            ]
+            try:
+                subprocess.run(cmd, capture_output=True, timeout=10)
+            except Exception:
+                pass
+
+
 if __name__ == "__main__":
     main()
