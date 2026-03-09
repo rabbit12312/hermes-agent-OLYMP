@@ -5,6 +5,7 @@ Rich-powered god-themed spinners, headers, colors, and status styles.
 Used by run_olympus.py to give the terminal the feel of Olympus.
 """
 
+import re
 import sys
 from typing import Optional
 
@@ -24,6 +25,50 @@ except ImportError:
     _RICH = False
 
 
+# ─────────────────────────────────────────────────────────────────
+# ANSI color codes for god names (used in live hermes terminal output)
+# ─────────────────────────────────────────────────────────────────
+
+RESET  = "\033[0m"
+BOLD   = "\033[1m"
+
+GOD_ANSI = {
+    "⚡ HERMES":    "\033[1;33m",   # bold yellow/gold
+    "⚔️ PERSEUS":   "\033[1;36m",   # bold cyan
+    "🌊 MNEMOSYNE": "\033[1;34m",   # bold blue
+    "🌿 ASCLEPIUS": "\033[1;32m",   # bold green
+    "👁️ ARGUS":     "\033[1;31m",   # bold red
+    "💪 HERACLES":  "\033[1;35m",   # bold magenta
+    "PERSEUS":    "\033[1;36m",
+    "MNEMOSYNE":  "\033[1;34m",
+    "ASCLEPIUS":  "\033[1;32m",
+    "ARGUS":      "\033[1;31m",
+    "HERACLES":   "\033[1;35m",
+    "HERMES":     "\033[1;33m",
+}
+
+# Regex to detect god name lines in agent output
+GOD_LINE_RE = re.compile(
+    r"(⚡|\u2694\ufe0f|\U0001F30A|\U0001F33F|\U0001F441\ufe0f|\U0001F4AA)?\s?"
+    r"(HERMES|PERSEUS|MNEMOSYNE|ASCLEPIUS|ARGUS|HERACLES)",
+    re.IGNORECASE
+)
+
+
+def colorize_god_output(text: str) -> str:
+    """
+    Scan a line of agent output and colorize god names with ANSI codes.
+    Works in any terminal that supports ANSI escape sequences (macOS/Linux).
+    """
+    def _replace(match):
+        full = match.group(0)
+        god  = match.group(2).upper()
+        color = GOD_ANSI.get(god, BOLD)
+        return f"{color}{full}{RESET}"
+
+    return GOD_LINE_RE.sub(_replace, text)
+
+
 class OlympusDisplay:
     """
     Terminal display handler for OLYMPUS.
@@ -35,9 +80,9 @@ class OlympusDisplay:
         display.status("Waiting for Perseus…")
     """
 
-    # ── God color palette ──────────────────────────────────────────
+    # ── God color palette (rich) ───────────────────────────────
     GOD_COLORS = {
-        "HERMES":    "bold gold1",
+        "HERMES":    "bold yellow",
         "PERSEUS":   "bold cyan",
         "MNEMOSYNE": "bold blue",
         "ASCLEPIUS": "bold green",
@@ -69,11 +114,11 @@ class OlympusDisplay:
     def __init__(self, quiet: bool = False):
         self.quiet = quiet
         if _RICH:
-            self.console = Console(stderr=False)
+            self.console = Console(stderr=False, highlight=False)
         else:
             self.console = None
 
-    # ── Public API ─────────────────────────────────────────────────
+    # ── Public API ─────────────────────────────────────────────
 
     def banner(self) -> None:
         """Print the OLYMPUS ASCII banner on startup."""
@@ -82,7 +127,7 @@ class OlympusDisplay:
         if _RICH:
             self.console.print(
                 Panel(
-                    Text(self.BANNER, style="bold gold1", justify="center"),
+                    Text(self.BANNER, style="bold yellow", justify="center"),
                     border_style="dim white",
                     box=box.DOUBLE,
                 )
@@ -100,7 +145,22 @@ class OlympusDisplay:
         if _RICH:
             self.console.print(line, style=color)
         else:
-            print(line)
+            ansi = GOD_ANSI.get(god.upper(), BOLD)
+            print(f"{ansi}{line}{RESET}")
+
+    def print_agent_line(self, line: str) -> None:
+        """
+        Print a line from agent output with god names colorized.
+        Call this instead of print() when streaming agent responses.
+        """
+        colored = colorize_god_output(line)
+        if _RICH:
+            # Use ANSI-precolored version since rich would escape it
+            sys.stdout.write(colored + "\n")
+            sys.stdout.flush()
+        else:
+            sys.stdout.write(colored + "\n")
+            sys.stdout.flush()
 
     def status(self, message: str) -> None:
         """Print a neutral status line."""
@@ -117,9 +177,9 @@ class OlympusDisplay:
             return
         rationale = plan.get("rationale", "")
         if _RICH:
-            self.console.print(f"\n⚡ {rationale}\n", style="bold gold1")
+            self.console.print(f"\n⚡ {rationale}\n", style="bold yellow")
         else:
-            print(f"\n⚡ {rationale}\n")
+            print(f"\n\033[1;33m⚡ {rationale}\033[0m\n")
 
     def divider(self) -> None:
         """Print a thin divider line."""
@@ -135,7 +195,7 @@ class OlympusDisplay:
         if _RICH:
             self.console.print(f"✗  {message}", style="bold red")
         else:
-            print(f"ERROR: {message}", file=sys.stderr)
+            print(f"\033[1;31m✗ {message}\033[0m", file=sys.stderr)
 
     def success(self, message: str) -> None:
         """Print a success message."""
@@ -144,7 +204,7 @@ class OlympusDisplay:
         if _RICH:
             self.console.print(f"✓  {message}", style="bold green")
         else:
-            print(f"OK: {message}")
+            print(f"\033[1;32m✓ {message}\033[0m")
 
     def cron_registered(self, name: str, schedule: str) -> None:
         """Confirm a cron job was registered."""
@@ -154,4 +214,4 @@ class OlympusDisplay:
         if _RICH:
             self.console.print(f"🕐  {msg}", style="bold cyan")
         else:
-            print(f"CRON: {msg}")
+            print(f"\033[1;36m🕐 {msg}\033[0m")
