@@ -13,24 +13,54 @@ import argparse
 import sys
 import os
 
-# ── Ensure project root is on path ────────────────────────────────
+# ── Ensure project root is on path ──────────────────────────────────
 _ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if _ROOT not in sys.path:
     sys.path.insert(0, _ROOT)
 
-from olympus.display import OlympusDisplay
+from olympus.display import OlympusDisplay, colorize_god_output
 from olympus.agents.hermes_orchestrator import HERMES_SYSTEM_PROMPT, route_to_gods
 
+
+# ─────────────────────────────────────────────────────────────────
+class ColorizedStdout:
+    """
+    Wraps sys.stdout to colorize god names on every write.
+    Installed for the duration of the hermes session.
+    """
+    def __init__(self, wrapped):
+        self._wrapped = wrapped
+
+    def write(self, text: str) -> int:
+        colored = colorize_god_output(text)
+        return self._wrapped.write(colored)
+
+    def flush(self):
+        self._wrapped.flush()
+
+    def __getattr__(self, name):
+        return getattr(self._wrapped, name)
+
+
+def install_colorizer():
+    """Replace sys.stdout with colorized version."""
+    sys.stdout = ColorizedStdout(sys.stdout)
+
+
+def uninstall_colorizer():
+    """Restore original sys.stdout."""
+    if isinstance(sys.stdout, ColorizedStdout):
+        sys.stdout = sys.stdout._wrapped
+
+
+# ─────────────────────────────────────────────────────────────────
 
 def build_cli_args(message: str = None, quiet: bool = False) -> list:
     """
     Build the argument list for hermes-agent CLI.
-
-    hermes-agent is launched as a subprocess (or imported if available)
-    with the HERMES system prompt set as the ephemeral prompt.
+    Skills are loaded via ~/.hermes/config.yaml default_skills.
     """
     args = [
-        "--skill", "olympus-hermes-orchestrator",
         "--ephemeral-system-prompt", HERMES_SYSTEM_PROMPT,
     ]
     if message:
@@ -46,8 +76,8 @@ def run_interactive(display: OlympusDisplay) -> None:
     display.god_speaking("HERMES", "Olympus is online. Speak, mortal.")
     display.divider()
 
+    install_colorizer()
     try:
-        # Import and run hermes interactively
         from cli import main as hermes_main
         sys.argv = ["hermes"] + build_cli_args()
         hermes_main()
@@ -59,6 +89,8 @@ def run_interactive(display: OlympusDisplay) -> None:
             "  cd /path/to/hermes-agent && python olympus/run_olympus.py"
         )
         sys.exit(1)
+    finally:
+        uninstall_colorizer()
 
 
 def run_one_shot(message: str, display: OlympusDisplay) -> None:
@@ -66,6 +98,7 @@ def run_one_shot(message: str, display: OlympusDisplay) -> None:
     plan = route_to_gods(message)
     display.routing(plan)
 
+    install_colorizer()
     try:
         from cli import main as hermes_main
         sys.argv = ["hermes"] + build_cli_args(message=message, quiet=True)
@@ -76,6 +109,8 @@ def run_one_shot(message: str, display: OlympusDisplay) -> None:
             "Run from the hermes-agent project root."
         )
         sys.exit(1)
+    finally:
+        uninstall_colorizer()
 
 
 def main() -> None:
