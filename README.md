@@ -1,121 +1,185 @@
-<p align="center">
-  <img src="assets/banner.png" alt="Hermes Agent" width="100%">
-</p>
+# 🏛️ OLYMPUS — A Living Second Brain
 
-# Hermes Agent ⚕
+> *Most AI assistants wait to be asked. OLYMPUS works while you sleep.*
 
-<p align="center">
-  <a href="https://hermes-agent.nousresearch.com/docs/"><img src="https://img.shields.io/badge/Docs-hermes--agent.nousresearch.com-FFD700?style=for-the-badge" alt="Documentation"></a>
-  <a href="https://discord.gg/NousResearch"><img src="https://img.shields.io/badge/Discord-5865F2?style=for-the-badge&logo=discord&logoColor=white" alt="Discord"></a>
-  <a href="https://github.com/NousResearch/hermes-agent/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge" alt="License: MIT"></a>
-  <a href="https://nousresearch.com"><img src="https://img.shields.io/badge/Built%20by-Nous%20Research-blueviolet?style=for-the-badge" alt="Built by Nous Research"></a>
-</p>
+OLYMPUS is a multi-agent Second Brain built on top of [Hermes Agent](https://nousresearch.com/hermes-agent). Five specialist agents — each named after a Greek god — share one persistent memory layer and work autonomously around the clock.
 
-**The self-improving AI agent built by [Nous Research](https://nousresearch.com).** It's the only agent with a built-in learning loop — it creates skills from experience, improves them during use, nudges itself to persist knowledge, searches its own past conversations, and builds a deepening model of who you are across sessions. Run it on a $5 VPS, a GPU cluster, or serverless infrastructure that costs nearly nothing when idle. It's not tied to your laptop — talk to it from Telegram while it works on a cloud VM.
-
-Use any model you want — [Nous Portal](https://portal.nousresearch.com), [OpenRouter](https://openrouter.ai) (200+ models), [z.ai/GLM](https://z.ai), [Kimi/Moonshot](https://platform.moonshot.ai), [MiniMax](https://www.minimax.io), OpenAI, or your own endpoint. Switch with `hermes model` — no code changes, no lock-in.
-
-<table>
-<tr><td><b>A real terminal interface</b></td><td>Full TUI with multiline editing, slash-command autocomplete, conversation history, interrupt-and-redirect, and streaming tool output.</td></tr>
-<tr><td><b>Lives where you do</b></td><td>Telegram, Discord, Slack, WhatsApp, Signal, and CLI — all from a single gateway process. Voice memo transcription, cross-platform conversation continuity.</td></tr>
-<tr><td><b>A closed learning loop</b></td><td>Agent-curated memory with periodic nudges. Autonomous skill creation after complex tasks. Skills self-improve during use. FTS5 session search with LLM summarization for cross-session recall. <a href="https://github.com/plastic-labs/honcho">Honcho</a> dialectic user modeling. Compatible with the <a href="https://agentskills.io">agentskills.io</a> open standard.</td></tr>
-<tr><td><b>Scheduled automations</b></td><td>Built-in cron scheduler with delivery to any platform. Daily reports, nightly backups, weekly audits — all in natural language, running unattended.</td></tr>
-<tr><td><b>Delegates and parallelizes</b></td><td>Spawn isolated subagents for parallel workstreams. Write Python scripts that call tools via RPC, collapsing multi-step pipelines into zero-context-cost turns.</td></tr>
-<tr><td><b>Runs anywhere, not just your laptop</b></td><td>Six terminal backends — local, Docker, SSH, Daytona, Singularity, and Modal. Daytona and Modal offer serverless persistence — your agent's environment hibernates when idle and wakes on demand, costing nearly nothing between sessions. Run it on a $5 VPS or a GPU cluster.</td></tr>
-<tr><td><b>Research-ready</b></td><td>Batch trajectory generation, Atropos RL environments, trajectory compression for training the next generation of tool-calling models.</td></tr>
-</table>
+You don't manage the system. You just live. Olympus handles the rest.
 
 ---
 
-## Quick Install
+## ⚡ How It Works
 
-```bash
-curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh | bash
+Every message you send is routed by **HERMES** — the orchestrator — to the right specialist. Gods work in parallel, share the same memory, and deliver results to your Telegram.
+
+```
+You speak → HERMES routes → Gods act → Memory persists → Telegram delivers
 ```
 
-Works on Linux, macOS, and WSL2. The installer handles everything — Python, Node.js, dependencies, and the `hermes` command. No prerequisites except git.
+All 5 gods read and write to the same `MEMORY.md`. Perseus writes, Mnemosyne reads, Asclepius analyzes, Argus enriches alerts — one brain, five specializations.
 
-> **Windows:** Native Windows is not supported. Please install [WSL2](https://learn.microsoft.com/en-us/windows/wsl/install) and run the command above.
+---
 
-After installation:
+## 🏛️ The Pantheon
 
-```bash
-source ~/.bashrc    # reload shell (or: source ~/.zshrc)
-hermes setup        # configure your LLM provider
-hermes              # start chatting!
+### ⚡ HERMES — The Orchestrator
+The central router. Every message passes through Hermes first. He decides which god (or gods) to wake, never answers from his own knowledge, and always shows which gods were consulted.
+
+- Routes to multiple gods **in parallel** when needed
+- Forbidden from touching memory or search directly
+- Always shows: `⚔️ PERSEUS captured / 🌊 MNEMOSYNE found / 👁️ ARGUS watching`
+
+---
+
+### ⚔️ PERSEUS — The Memory Hunter
+Captures **everything** you say and structures it into persistent, tagged memory.
+
+```
+[PERSON]   Anton Volkov — prefers directness, works in VC. Met 2026-03-10.
+[EVENT]    Meeting with Anton, 2026-03-11 09:00 — goal: OLYMPUS demo.
+[TASK]     Submit hackathon project — deadline: 2026-03-15 | priority: high
+[IDEA]     AI job aggregator with candidate scoring — mentioned 3x, growing excitement
+[DECISION] Chose Python over TypeScript — reason: hermes-agent ecosystem
 ```
 
+**Pattern detection:** if a topic or person appears 3+ times, Perseus automatically creates a pattern file at `~/.hermes/olympus/patterns/[topic].md` — tracking all occurrences, dates, and emerging patterns.
+
 ---
 
-## Getting Started
+### 🌊 MNEMOSYNE — The Goddess of Memory
+Searches your entire history **by meaning**, not keywords. Finds what you forgot you knew.
 
-```bash
-hermes              # Interactive CLI — start a conversation
-hermes model        # Switch provider or model
-hermes setup        # Re-run the setup wizard
-hermes gateway      # Start the messaging gateway (Telegram, Discord, etc.)
-hermes update       # Update to the latest version
-hermes doctor       # Diagnose any issues
+Searches 3 layers simultaneously:
+1. **Memory context** — instant scan of current `MEMORY.md`
+2. **Past sessions** — deep search across all conversation history
+3. **Olympus files** — notes and pattern files in `~/.hermes/olympus/`
+
+Always returns: direct answer + related discoveries + pattern note.
+
+> *"That startup idea" → finds first mention (Feb 12), all 6 occurrences, emotional trajectory, and flags it as high-recurrence.*
+
+---
+
+### 🌿 ASCLEPIUS — The Pattern Healer
+Runs **every morning at 09:00** via cron. Reads 7 days of memory, finds non-obvious behavioral patterns, sends top 3 insights to Telegram.
+
+Pattern categories:
+- **Energy cycles** — days/times when fatigue appears
+- **Procrastination signatures** — tasks appearing multiple times without `[DONE]`
+- **High-frequency people** — relationships that need attention
+- **Idea momentum** — ideas mentioned 6x are not casual thoughts
+- **Emotional drift** — excitement → frustration = blocked project
+- **Unresolved threads** — past events with no follow-up
+
 ```
+🌿 ASCLEPIUS — Morning Diagnostics
 
-📖 **[Full documentation →](https://hermes-agent.nousresearch.com/docs/)**
+PATTERN 1: Wednesday Fatigue Cycle
+You mention low energy on Wednesdays 3 weeks in a row.
+→ Consider moving one meeting to Tuesday.
 
----
-
-## Documentation
-
-All documentation lives at **[hermes-agent.nousresearch.com/docs](https://hermes-agent.nousresearch.com/docs/)**:
-
-| Section | What's Covered |
-|---------|---------------|
-| [Quickstart](https://hermes-agent.nousresearch.com/docs/getting-started/quickstart) | Install → setup → first conversation in 2 minutes |
-| [CLI Usage](https://hermes-agent.nousresearch.com/docs/user-guide/cli) | Commands, keybindings, personalities, sessions |
-| [Configuration](https://hermes-agent.nousresearch.com/docs/user-guide/configuration) | Config file, providers, models, all options |
-| [Messaging Gateway](https://hermes-agent.nousresearch.com/docs/user-guide/messaging) | Telegram, Discord, Slack, WhatsApp, Signal, Home Assistant |
-| [Security](https://hermes-agent.nousresearch.com/docs/user-guide/security) | Command approval, DM pairing, container isolation |
-| [Tools & Toolsets](https://hermes-agent.nousresearch.com/docs/user-guide/features/tools) | 40+ tools, toolset system, terminal backends |
-| [Skills System](https://hermes-agent.nousresearch.com/docs/user-guide/features/skills) | Procedural memory, Skills Hub, creating skills |
-| [Memory](https://hermes-agent.nousresearch.com/docs/user-guide/features/memory) | Persistent memory, user profiles, best practices |
-| [MCP Integration](https://hermes-agent.nousresearch.com/docs/user-guide/features/mcp) | Connect any MCP server for extended capabilities |
-| [Cron Scheduling](https://hermes-agent.nousresearch.com/docs/user-guide/features/cron) | Scheduled tasks with platform delivery |
-| [Context Files](https://hermes-agent.nousresearch.com/docs/user-guide/features/context-files) | Project context that shapes every conversation |
-| [Architecture](https://hermes-agent.nousresearch.com/docs/developer-guide/architecture) | Project structure, agent loop, key classes |
-| [Contributing](https://hermes-agent.nousresearch.com/docs/developer-guide/contributing) | Development setup, PR process, code style |
-| [CLI Reference](https://hermes-agent.nousresearch.com/docs/reference/cli-commands) | All commands and flags |
-| [Environment Variables](https://hermes-agent.nousresearch.com/docs/reference/environment-variables) | Complete env var reference |
-
----
-
-## Contributing
-
-We welcome contributions! See the [Contributing Guide](https://hermes-agent.nousresearch.com/docs/developer-guide/contributing) for development setup, code style, and PR process.
-
-Quick start for contributors:
-
-```bash
-git clone --recurse-submodules https://github.com/NousResearch/hermes-agent.git
-cd hermes-agent
-curl -LsSf https://astral.sh/uv/install.sh | sh
-uv venv .venv --python 3.11
-source .venv/bin/activate
-uv pip install -e ".[all,dev]"
-uv pip install -e "./mini-swe-agent"
-python -m pytest tests/ -q
+PATTERN 2: Stalled task — "OLYMPUS README"
+Appears in 3 sessions without [DONE] tag.
+→ Schedule a focused 30-min block today.
 ```
 
 ---
 
-## Community
+### 👁️ ARGUS — The Hundred-Eyed Giant
+Never sleeps. Checks your watch list **every 30 minutes**. When a condition triggers, fetches memory context about the subject and sends a rich Telegram alert.
 
-- 💬 [Discord](https://discord.gg/NousResearch)
-- 📚 [Skills Hub](https://agentskills.io)
-- 🐛 [Issues](https://github.com/NousResearch/hermes-agent/issues)
-- 💡 [Discussions](https://github.com/NousResearch/hermes-agent/discussions)
+Not just: *"Meeting in 2 minutes"*
+But: *"Anton prefers directness. Your goal: demo OLYMPUS architecture. Last meeting went well."*
+
+Watch types:
+| Type | Example |
+|------|--------|
+| `time_before` | Alert 5 min before any event |
+| `recurring_time` | Every morning at 08:00 |
+| `deadline` | 3 hours before task deadline |
+| `custom_check` | Any custom condition |
 
 ---
 
-## License
+### 💪 HERACLES — The Weekly Synthesizer
+Every **Sunday at 19:00**, reads the entire week, and delivers one structured digest to Telegram.
 
-MIT — see [LICENSE](LICENSE).
+Sections:
+- 🏆 **VICTORIES** — what actually got done
+- 📅 **WEEK IN EVENTS** — people, meetings, decisions
+- ⚡ **WHAT MOVED FORWARD** — projects and ideas with momentum
+- 🔄 **STILL OPEN** — unresolved threads (most actionable section)
+- 🌿 **ASCLEPIUS WISDOM** — top weekly pattern
+- 📊 **NUMBERS** — sessions, memories captured, people engaged
 
-Built by [Nous Research](https://nousresearch.com).
+---
+
+## 🚀 Quick Start
+
+```bash
+# 1. Clone
+git clone https://github.com/rabbit12312/hermes-agent-OLYMP
+cd hermes-agent-OLYMP
+
+# 2. Install Hermes Agent
+pip install hermes-agent
+# or: curl -fsSL https://get.hermes.sh | sh
+
+# 3. Copy config with OLYMPUS gods pre-loaded
+cp cli-config.yaml.example ~/.hermes/cli-config.yaml
+
+# 4. Add your API key to .env
+cp .env.example .env
+# edit .env: add ANTHROPIC_API_KEY or OPENAI_API_KEY
+
+# 5. Run
+hermes
+```
+
+All 5 gods are pre-loaded via `default_skills` in the config. Cron jobs for Asclepius, Argus, and Heracles start automatically.
+
+---
+
+## 📁 Project Structure
+
+```
+hermes-agent-OLYMP/
+├── olympus/              # God skill files
+│   ├── hermes.md         # Orchestrator — routing rules
+│   ├── perseus.md        # Memory capture & tagging
+│   ├── mnemosyne.md      # Semantic memory search
+│   ├── asclepius.md      # Daily pattern analysis
+│   ├── argus.md          # Monitoring & alerts
+│   └── heracles.md       # Weekly digest
+├── cli-config.yaml.example  # Ready config with default_skills
+├── .env.example          # API keys template
+└── cron/                 # Cron job schedulers
+```
+
+---
+
+## 🛠️ Stack
+
+- **[Hermes Agent](https://nousresearch.com/hermes-agent)** — multi-agent framework
+- **Claude Sonnet** via Anthropic (or any supported LLM)
+- **Cron jobs** — Asclepius daily, Argus every 30min, Heracles weekly
+- **Telegram** — delivery channel for all proactive outputs
+- **Markdown memory** — `MEMORY.md` + `USER.md` as persistent state
+
+---
+
+## 💡 The Core Insight
+
+The difference between OLYMPUS and a regular AI assistant:
+
+| Regular Assistant | OLYMPUS |
+|---|---|
+| Answers when asked | Acts autonomously on schedule |
+| No memory between sessions | Persistent structured memory |
+| One agent does everything | 5 specialists, each owns one domain |
+| You manage the system | System manages itself |
+| Forgets who you met yesterday | Remembers patterns across weeks |
+
+---
+
+Built with ❤️ for the Hermes Agent hackathon · Nous Research
